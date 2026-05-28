@@ -66,12 +66,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Configurar CORS explícitamente para tu frontend
+                // 1. Configurar CORS explícitamente para Desarrollo y Producción Cloud
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new org.springframework.web.cors.CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173")); // Tu puerto de Vite
+
+                    // Aquí permitimos tanto tu entorno local como el dominio de Vercel en la nube
+                    config.setAllowedOrigins(List.of(
+                            "http://localhost:5173",
+                            "https://task-tracker-front.vercel.app" // <-- ⚠️ REEMPLAZA ESTO con tu URL real cuando Vercel te la dé
+                    ));
+
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+                    config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+                    config.setAllowCredentials(true); // Permite el manejo seguro de sesiones/cookies si fuera necesario
                     return config;
                 }))
                 // 2. Mantener tu protección CSRF desactivada
