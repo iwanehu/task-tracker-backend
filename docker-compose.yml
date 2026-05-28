@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 🍃 Contenedor de la Base de Datos Local
+  mongodb:
+    image: mongo:7.0
+    container_name: task_tracker_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - task_network
+
+  # ☕ Contenedor de tu Backend (Spring Boot)
+  backend:
+    build: .
+    container_name: task_tracker_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    environment:
+      # Sobrescribimos la propiedad de Spring para que apunte al contenedor de mongo local
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/tasktracker
+      # Si quisieras seguir usando Atlas dentro de Docker, simplemente cambiarías la línea de arriba por tu URL de Atlas:
+      # - SPRING_DATA_MONGODB_URI=mongodb+srv://tu_usuario:tu_password@cluster...
+    networks:
+      - task_network
+
+volumes:
+  mongo_data: # Mantiene tus tareas guardadas aunque apagues el contenedor
+
+networks:
+  task_network:
+    driver: bridge

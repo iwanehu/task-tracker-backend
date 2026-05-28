@@ -1,0 +1,84 @@
+package task_tracker.demo.config;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+
+@Service
+public class JwtService {
+
+
+
+
+    // Generamos una clave segura para firmar los tokens (mínimo 256 bits)
+
+    private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+
+    //eL TOKEN EXPIRA EN 24 H
+
+    private static final long JW_EXPIRATION = 86400000;
+
+
+    //1 Extaer el email (username) del token
+
+    public String extarctUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    // 2 Generar un token limpio para un usuario
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(),userDetails);
+    }
+
+
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis()+ JW_EXPIRATION))
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+
+    //3 validar si el token pertenece al usuario y no ha expirado
+    public  boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extarctUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);    }
+
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token ,Claims::getExpiration);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractClaim(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractClaim(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token).getBody();
+
+    }
+
+
+}
