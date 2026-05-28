@@ -1,6 +1,5 @@
 package task_tracker.demo.config;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +31,6 @@ public class SecurityConfig {
     private UserRepository userRepository;
 
     //1.Le enseñamos a Spring a buscar a usuarios en mongo db usando el email
-
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
@@ -51,9 +49,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-
     }
-
 
     // 3.el encriptado de contraseña oficial
     @Bean
@@ -62,7 +58,6 @@ public class SecurityConfig {
     }
 
     //4 .el filtro
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -70,15 +65,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new org.springframework.web.cors.CorsConfiguration();
 
-                    // Aquí permitimos tanto tu entorno local como el dominio de Vercel en la nube
+                    // Cambiado aquí: añadida tu URL de producción real de Vercel sin la "/" final
                     config.setAllowedOrigins(List.of(
                             "http://localhost:5173",
-                            "https://task-tracker-front.vercel.app" // <-- ⚠️ REEMPLAZA ESTO con tu URL real cuando Vercel te la dé
+                            "https://task-tracker-font-iwanehu-gmailcoms-projects.vercel.app"
                     ));
 
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
-                    config.setAllowCredentials(true); // Permite el manejo seguro de sesiones/cookies si fuera necesario
+                    config.setAllowCredentials(true);
                     return config;
                 }))
                 // 2. Mantener tu protección CSRF desactivada
