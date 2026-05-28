@@ -3,6 +3,7 @@ package task_tracker.demo.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // <-- Asegúrate de tener este import si te lo pide el IDE
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -61,14 +62,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Configurar CORS explícitamente para Desarrollo y Producción Cloud
+                // Configurar CORS explícitamente para Desarrollo y Producción Cloud
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new org.springframework.web.cors.CorsConfiguration();
 
-                    // Cambiado aquí: añadida tu URL de producción real de Vercel sin la "/" final
+                    // He añadido tus dos URLs de Vercel (la fija y la del último despliegue) por si acaso
                     config.setAllowedOrigins(List.of(
                             "http://localhost:5173",
-                            "https://task-tracker-font-iwanehu-gmailcoms-projects.vercel.app"
+                            "https://task-tracker-font-iwanehu-gmailcoms-projects.vercel.app",
+                            "https://task-tracker-font-74j3d0irp-iwanehu-gmailcoms-projects.vercel.app"
                     ));
 
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -76,9 +78,11 @@ public class SecurityConfig {
                     config.setAllowCredentials(true);
                     return config;
                 }))
-                // 2. Mantener tu protección CSRF desactivada
+                // Mantener  protección CSRF desactivada
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // 🛠️ MODIFICACIÓN AQUÍ: Vía libre a las peticiones de control OPTIONS de los navegadores
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll() // Rutas públicas (Login/Registro)
                         .anyRequest().authenticated()
                 )
