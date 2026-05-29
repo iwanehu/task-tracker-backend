@@ -84,6 +84,9 @@ public class SecurityConfig {
                         // 🛠️ MODIFICACIÓN AQUÍ: Vía libre a las peticiones de control OPTIONS de los navegadores
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll() // Rutas públicas (Login/Registro)
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
