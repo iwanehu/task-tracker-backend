@@ -36,9 +36,9 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        // Si la ruta pertenece a Swagger o OpenAPI, devolvemos true para que el filtro NO se aplique
-        return path.startsWith("/swagger-ui") ||
-                path.startsWith("/v3/api-docs") ||
+        // Usamos contains y startsWith para cubrir /v3/api-docs, /v3/api-docs/ y subrecursos
+        return path.contains("/v3/api-docs") ||
+                path.startsWith("/swagger-ui") ||
                 path.startsWith("/swagger-resources") ||
                 path.startsWith("/webjars");
     }

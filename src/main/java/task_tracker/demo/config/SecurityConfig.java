@@ -79,20 +79,17 @@ public class SecurityConfig {
                     config.setAllowCredentials(true);
                     return config;
                 }))
-                // Mantener  protección CSRF desactivada
+                //
                 // Mantener protección CSRF desactivada usando Method Reference
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // 🛠️ Vía libre a las peticiones de control OPTIONS de los navegadores
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll() // Rutas públicas (Login/Registro)
+                        .requestMatchers("/api/auth/**").permitAll()
 
-                        // 📝 CAPA DE ACCESO TOTAL PARA SWAGGER (Bloque corporativo blindado)
-                        .requestMatchers("/v3/api-docs").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers("/swagger-resources/**").permitAll()
+                        //  CAPA SWAGGER BLINDADA CON DOBLE COMODÍN
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-resources", "/swagger-resources/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
 
                         .anyRequest().authenticated()
