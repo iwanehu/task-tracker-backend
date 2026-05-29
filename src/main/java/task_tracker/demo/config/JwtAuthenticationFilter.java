@@ -17,6 +17,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class JwtAuthenticationFilter  extends OncePerRequestFilter {
 
@@ -27,6 +30,8 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
     @Autowired
     @Lazy
     private UserDetailsService userDetailsService;
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Override
     protected void doFilterInternal(
@@ -39,32 +44,49 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
+        log.info("Procesando peticion HTTP: [{}] {}", request.getMethod(), request.getRequestURI());
+
         // Si no viene la cabecera Authorization o no empieza por "Bearer ", dejamos pasar la petición
         // (ya decidirá Spring Security más adelante si la ruta requería autenticación o no)
 
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
+            log.info("Peticion sin token JWT Bearer para la ruta: {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
         jwt = authHeader.substring(7); // Extraemos el token quitando "Bearer "
-        userEmail = jwtService.extarctUsername(jwt); //sacamos el email del token
-
-        // si hay email y el usuario no esta autenticado con el contexto spring
-        if(userEmail != null && SecurityContextHolder.getContext().getAuthentication()==null){
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
 
-            //si el token es totalmente valido ,lo metemos en el contexto de seguridad de spring
-            if(jwtService.isTokenValid(jwt,userDetails)){
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
+        try{
+            userEmail = jwtService.extarctUsername(jwt); //sacamos el email del token
+
+            // si hay email y el usuario no esta autenticado con el contexto spring
+            if(userEmail != null && SecurityContextHolder.getContext().getAuthentication()==null){
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+
+                //si el token es totalmente valido ,lo metemos en el contexto de seguridad de spring
+                if(jwtService.isTokenValid(jwt,userDetails)){
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    log.info("Usuario [{}] autenticado con exito en Spring Security", userEmail );
         }
+                else {
+                    log.warn("El token JWT provisto para el usuario [{}] no es valido o expiro", userEmail);
+                }
+
+
+
+            }
+        }catch (Exception e){
+            log.error("Fallo critico al interceptar y parsear el token JWT: {}", e.getMessage());
+        }
+
         filterChain.doFilter(request, response);
 
     }
