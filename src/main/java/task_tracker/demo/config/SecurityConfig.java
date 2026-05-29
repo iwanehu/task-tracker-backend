@@ -72,24 +72,13 @@ public class SecurityConfig {
                     return config;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // 📝 NUEVO: Deshabilitar la protección de frames para que cargue el JSON interno de Swagger
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Permitir despachos internos de error del framework (Crucial para Spring Boot 3.4+)
                         .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
-
-                        // 2. Controladores de navegación estándar
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // 3. Rutas de Swagger y OpenAPI completamente liberadas
-                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/swagger-resources", "/swagger-resources/**").permitAll()
-                        .requestMatchers("/webjars/**").permitAll()
-                        .requestMatchers("/error", "/error/**").permitAll()
+                        // Rutas globales de Swagger (Apertura total)
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                         .anyRequest().authenticated()
                 )
@@ -99,5 +88,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }
