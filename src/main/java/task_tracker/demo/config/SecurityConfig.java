@@ -10,6 +10,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -79,14 +80,21 @@ public class SecurityConfig {
                     return config;
                 }))
                 // Mantener  protección CSRF desactivada
-                .csrf(csrf -> csrf.disable())
+                // Mantener protección CSRF desactivada usando Method Reference
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // 🛠️ MODIFICACIÓN AQUÍ: Vía libre a las peticiones de control OPTIONS de los navegadores
+                        // 🛠️ Vía libre a las peticiones de control OPTIONS de los navegadores
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll() // Rutas públicas (Login/Registro)
-                        .requestMatchers("/swagger-ui/**").permitAll()
+
+                        // 📝 CAPA DE ACCESO TOTAL PARA SWAGGER (Bloque corporativo blindado)
+                        .requestMatchers("/v3/api-docs").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
