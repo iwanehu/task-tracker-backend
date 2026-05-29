@@ -44,7 +44,7 @@ public class TaskController {
 
     //GET TASK BY ID
     @GetMapping("/{id}")   //ResponseEntity<T> es un envoltorio que Spring usa para devolver:un código HTTP,header,un body
-    public ResponseEntity<TaskResponseDTO> getTaskByid(@PathVariable String id){
+    public ResponseEntity<TaskResponseDTO> getTaskByid(@PathVariable("id") String id){
         Task task = taskService.getTaskById(id);
         return ResponseEntity.ok(taskMapper.toDto(task));
     }
@@ -63,7 +63,7 @@ public class TaskController {
 
     //UPDATE TASK
     @PutMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> updateTask( @PathVariable String id,@Valid @RequestBody TaskRequestDTO taskDetails){
+    public ResponseEntity<TaskResponseDTO> updateTask( @PathVariable("id") String id,@Valid @RequestBody TaskRequestDTO taskDetails){
 
         Task taskChanges = taskMapper.toEntity(taskDetails);
 
@@ -73,7 +73,7 @@ public class TaskController {
 
 
      @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteTask(@PathVariable String id){
+    public ResponseEntity<Boolean> deleteTask(@PathVariable("id") String id){
 
         taskService.deleteTaskByid(id);
         return ResponseEntity.ok().build();
