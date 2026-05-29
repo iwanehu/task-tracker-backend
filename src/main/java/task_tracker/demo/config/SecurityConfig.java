@@ -77,15 +77,19 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll() // Login y Registro
+                        // 1. Permitir despachos internos de error del framework (Crucial para Spring Boot 3.4+)
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
 
-                        // 📝 COMODINES MASIVOS Y APERTURA DE RUTA DE ERROR
-                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
+                        // 2. Controladores de navegación estándar
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // 3. Rutas de Swagger y OpenAPI completamente liberadas
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/swagger-resources", "/swagger-resources/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
-                        .requestMatchers("/error", "/error/**").permitAll() // <-- CLAVE: Si hay un fallo interno, queremos verlo, no un 403
+                        .requestMatchers("/error", "/error/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
