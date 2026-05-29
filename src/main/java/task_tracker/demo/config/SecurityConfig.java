@@ -78,13 +78,12 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll() // Login y Registro
 
-                        // Rutas de Swagger plenamente abiertas
-                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/swagger-resources", "/swagger-resources/**").permitAll()
-                        .requestMatchers("/webjars/**").permitAll()
+                        // 📝 CAPA SWAGGER ESTÁNDAR PARA SPRING BOOT 3.4+
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
 
                         .anyRequest().authenticated()
                 )
