@@ -80,10 +80,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll() // Login y Registro
 
-                        // 📝 CAPA SWAGGER ESTÁNDAR PARA SPRING BOOT 3.4+
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
+                        // 📝 COMODINES MASIVOS Y APERTURA DE RUTA DE ERROR
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
+                        .requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-resources", "/swagger-resources/**").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
+                        .requestMatchers("/error", "/error/**").permitAll() // <-- CLAVE: Si hay un fallo interno, queremos verlo, no un 403
 
                         .anyRequest().authenticated()
                 )
