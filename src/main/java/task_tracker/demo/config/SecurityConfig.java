@@ -72,11 +72,15 @@ public class SecurityConfig {
                     return config;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
+
+                // 📝 NUEVO: Deshabilitar la protección de frames para que cargue el JSON interno de Swagger
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // Permiso explícito en la cadena de filtros estándar
+                        // Rutas de Swagger plenamente abiertas
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-resources", "/swagger-resources/**").permitAll()
