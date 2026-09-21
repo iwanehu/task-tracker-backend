@@ -11,11 +11,11 @@ The frontend and backend are deployed independently using **Docker**, **Nginx**,
 ### Frontend
 https://tasks.164-132-187-235.sslip.io
 
-### API
-https://task.164-132-187-235.sslip.io
-
-### Swagger / OpenAPI
+### API Documentation
 https://task.164-132-187-235.sslip.io/swagger-ui/index.html
+
+### OpenAPI
+https://task.164-132-187-235.sslip.io/v3/api-docs
 
 ---
 
