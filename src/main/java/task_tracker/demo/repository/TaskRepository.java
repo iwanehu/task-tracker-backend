@@ -1,34 +1,50 @@
 package task_tracker.demo.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import task_tracker.demo.model.Task;
-
-import org.springframework.data.mongodb.repository.MongoRepository;
 import task_tracker.demo.model.TaskPriority;
 import task_tracker.demo.model.TaskStatus;
 
 import java.util.List;
 
-public interface TaskRepository extends MongoRepository<Task, String> {
+public interface TaskRepository extends JpaRepository<Task, Long> {
 
-   //Filtros por usurio globales
-    List<Task> findByUserIdOrderByCreatedAtDesc(String userId);
-    List<Task> findByUserIdOrderByCreatedAtAsc(String userId);
+ // Usuario
+ List<Task> findByUserIdOrderByCreatedAtDesc(Long userId);
+ List<Task> findByUserIdOrderByCreatedAtAsc(Long userId);
 
-    //Filtro por usuario + Estatus
+ // Usuario + status
+ List<Task> findByUserIdAndStatusOrderByCreatedAtDesc(
+         Long userId,
+         TaskStatus status
+ );
 
-    List<Task> findByUserIdAndStatusOrderByCreatedAtDesc(String userId, TaskStatus status);
-    List<Task> findByUserIdAndStatusOrderByCreatedAtAsc(String userId, TaskStatus status);
+ List<Task> findByUserIdAndStatusOrderByCreatedAtAsc(
+         Long userId,
+         TaskStatus status
+ );
 
+ // Usuario + priority
+ List<Task> findByUserIdAndPriorityOrderByCreatedAtDesc(
+         Long userId,
+         TaskPriority priority
+ );
 
-    //Filtrar por usuario y prioridad
-    List<Task> findByUserIdAndPriorityOrderByCreatedAtDesc(String userId, TaskPriority priority);
-    List<Task> findByUserIdAndPriorityOrderByCreatedAtAsc(String userId, TaskPriority priority);
+ List<Task> findByUserIdAndPriorityOrderByCreatedAtAsc(
+         Long userId,
+         TaskPriority priority
+ );
 
+ // Usuario + status + priority
+ List<Task> findByUserIdAndStatusAndPriorityOrderByCreatedAtDesc(
+         Long userId,
+         TaskStatus status,
+         TaskPriority priority
+ );
 
-    //FIltro maestro :Usuario + Estatus + Prioridad
-
-    List<Task> findByUserIdAndStatusAndPriorityOrderByCreatedAtDesc(String userId, TaskStatus status, TaskPriority priority);
-    List<Task> findByUserIdAndStatusAndPriorityOrderByCreatedAtAsc(String userId, TaskStatus status, TaskPriority priority);
-
-
+ List<Task> findByUserIdAndStatusAndPriorityOrderByCreatedAtAsc(
+         Long userId,
+         TaskStatus status,
+         TaskPriority priority
+ );
 }

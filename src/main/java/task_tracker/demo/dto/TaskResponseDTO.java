@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public class TaskResponseDTO {
 
-    private String id;
+    private Long id;
     private String title;
     private String description;
     private TaskStatus status;
@@ -15,14 +15,11 @@ public class TaskResponseDTO {
     private LocalDateTime updateAt;
     private TaskPriority priority;
 
-    //Getter and Setter
-
-
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

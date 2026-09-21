@@ -18,7 +18,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # Exponer el puerto en el que corre tu API
-EXPOSE 8080
+EXPOSE 8083
 
 # Comando para arrancar tu backend
 ENTRYPOINT ["java", "-jar", "app.jar"]

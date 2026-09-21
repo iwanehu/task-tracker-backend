@@ -1,46 +1,44 @@
 package task_tracker.demo.model;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import org.springframework.data.mongodb.core.index.Indexed;
 
-@Document(collection = "users")
+@Entity
+@Table(name = "users")
 @Data
 @NoArgsConstructor
-
-public class User  implements UserDetails {
+public class User implements UserDetails {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Indexed(unique = true) // No permite emails repetidos en mongodb
+    @Column(nullable = false, unique = true)
     private String email;
 
-
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String name;
 
-
-    // Métodos obligatorios de UserDetails para gestionar roles/permisos
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
     public String getUsername() {
-        return this.email; //email como credencial de login
-
+        return this.email;
     }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -60,7 +58,4 @@ public class User  implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-
-
 }
