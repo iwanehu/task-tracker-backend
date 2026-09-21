@@ -13,10 +13,10 @@ public class SpringDocConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        // Forzamos que el servidor apunte a tu URL de Render con HTTPS nativo
+
         Server productionServer = new Server()
-                .url("https://task-tracker-backend-xjox.onrender.com")
-                .description("Servidor de Producción en Render");
+                .url("https://task.164-132-187-235.sslip.io")
+                .description("Servidor de Producción VPS");
 
         return new OpenAPI()
                 .servers(List.of(productionServer))
